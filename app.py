@@ -100,7 +100,7 @@ def predict_image(image):
 
     prediction = svm.predict(features)[0]
 
-    return CLASS_NAMES[prediction]
+    return CLASS_NAMES[int(prediction)]
 
 
 # ---------------- Load Models ----------------
@@ -113,7 +113,17 @@ except Exception as e:
 
 
 # ---------------- UI ----------------
-st.title("👁️ Diabetic Retinopathy Detection")
+# st.title("👁️ Diabetic Retinopathy Detection")
+st.markdown("""
+<h1 style='text-align:center; color:#1E88E5;'>
+👁️ Diabetic Retinopathy Detection
+</h1>
+<h4 style='text-align:center;'>
+AI-Powered Retinal Screening System
+</h4>
+""", unsafe_allow_html=True)
+
+st.divider()
 
 st.markdown(
     """
@@ -122,14 +132,20 @@ st.markdown(
     """
 )
 
+# uploaded_file = st.file_uploader(
+#     "Upload Retinal Image",
+#     type=["jpg", "jpeg", "png"]
+# )
+st.subheader("📤 Upload Retinal Fundus Image")
+
 uploaded_file = st.file_uploader(
-    "Upload Retinal Image",
-    type=["jpg", "jpeg", "png"]
+    "",
+    type=["jpg","jpeg","png"]
 )
 
 if uploaded_file:
-
-    st.image(
+    with st.container(border=True):
+        st.image(
         uploaded_file,
         caption="Uploaded Retinal Image",
         use_container_width=True
@@ -138,9 +154,19 @@ if uploaded_file:
     st.markdown("### Ready for Analysis")
     if st.button("🔍 Predict DR Stage", width="stretch"):
         image = Image.open(uploaded_file).convert("RGB")
-        prediction = predict_image(image)
-        st.success(f"🩺 Predicted Stage: {prediction}")
-        st.info(DESCRIPTIONS[prediction])
+        with st.spinner("Analyzing retinal image..."):
+            prediction = predict_image(image)
+            STATUS = {
+                "No DR":"🟢",
+                "Mild":"🟡",
+                "Moderate":"🟠",
+                "Severe":"🔴",
+                "Proliferative":"🚨"
+            }
+            st.success(
+                f"{STATUS[prediction]} {prediction}"
+                )
+            st.info(DESCRIPTIONS[prediction])
     # if st.button("🔍 Predict DR Stage", use_container_width=True):
     #     image = Image.open(uploaded_file).convert("RGB")
     #     prediction = predict_image(image)
