@@ -87,6 +87,15 @@ DESCRIPTIONS = {
     "Severe": "Significant retinal damage detected.",
     "Proliferative": "Advanced diabetic retinopathy detected. Immediate ophthalmologist consultation is recommended."
 }
+def is_retinal_image(image):
+    img = np.array(image.resize((224,224)))
+
+    r_mean = img[:,:,0].mean()
+    g_mean = img[:,:,1].mean()
+    b_mean = img[:,:,2].mean()
+
+    # Retina images usually have more red/orange tones
+    return r_mean > g_mean and r_mean > b_mean
 def predict_image(image):
 
     # image = transform(image).unsqueeze(0)
@@ -142,6 +151,9 @@ uploaded_file = st.file_uploader(
     "",
     type=["jpg","jpeg","png"]
 )
+st.warning(
+    "⚠️ Upload only retinal fundus images. Other image types may produce incorrect predictions."
+)
 
 if uploaded_file:
     with st.container(border=True):
@@ -154,19 +166,35 @@ if uploaded_file:
     st.markdown("### Ready for Analysis")
     if st.button("🔍 Predict DR Stage", width="stretch"):
         image = Image.open(uploaded_file).convert("RGB")
-        with st.spinner("Analyzing retinal image..."):
-            prediction = predict_image(image)
-            STATUS = {
-                "No DR":"🟢",
-                "Mild":"🟡",
-                "Moderate":"🟠",
-                "Severe":"🔴",
-                "Proliferative":"🚨"
-            }
-            st.success(
-                f"{STATUS[prediction]} {prediction}"
-                )
-            st.info(DESCRIPTIONS[prediction])
+        if not is_retinal_image(image):
+            st.error("❌ Please upload a retinal fundus image only.")
+        else:
+            with st.spinner("Analyzing retinal image..."):
+                prediction = predict_image(image)
+                STATUS = {
+                    "No DR":"🟢",
+                    "Mild":"🟡",
+                    "Moderate":"🟠",
+                    "Severe":"🔴",
+                    "Proliferative":"🚨"
+                    }
+                st.success(f"{STATUS[prediction]} {prediction}")
+                st.info(DESCRIPTIONS[prediction])
+    # if st.button("🔍 Predict DR Stage", width="stretch"):
+    #     image = Image.open(uploaded_file).convert("RGB")
+    #     with st.spinner("Analyzing retinal image..."):
+    #         prediction = predict_image(image)
+    #         STATUS = {
+    #             "No DR":"🟢",
+    #             "Mild":"🟡",
+    #             "Moderate":"🟠",
+    #             "Severe":"🔴",
+    #             "Proliferative":"🚨"
+    #         }
+    #         st.success(
+    #             f"{STATUS[prediction]} {prediction}"
+    #             )
+    #         st.info(DESCRIPTIONS[prediction])
     # if st.button("🔍 Predict DR Stage", use_container_width=True):
     #     image = Image.open(uploaded_file).convert("RGB")
     #     prediction = predict_image(image)
