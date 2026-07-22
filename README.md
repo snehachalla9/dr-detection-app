@@ -2,12 +2,6 @@
 
 > An AI-powered web application for early detection and classification of Diabetic Retinopathy from retinal fundus images using **CLAHE, EfficientNet-B0, and SVM**.
 
-![Python](https://img.shields.io/badge/Python-3.11-blue)
-![PyTorch](https://img.shields.io/badge/PyTorch-Deep%20Learning-red)
-![Streamlit](https://img.shields.io/badge/Streamlit-Web%20App-FF4B4B)
-![License](https://img.shields.io/badge/License-MIT-green)
-
----
 
 ## 📌 Overview
 
